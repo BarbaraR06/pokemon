@@ -40,9 +40,9 @@ router.get('/pokemon/:name', async (req, res) => {
     try {
         if (name) {
             const pokemonName = await allPokemons.filter(e => e.name == name);
-            pokemonName.length ?
-                res.status(200).json(pokemonName) :
-                res.status(404).send('Pokemon no encontrado')
+            pokemonName.length 
+             ? res.status(200).json(pokemonName) 
+             : res.status(404).send('Pokemon no encontrado')
         }
     } catch (error) {
         console.log(error);
@@ -81,7 +81,7 @@ router.post('/', async (req, res) => {
         }
     }) 
     newPokemon.addType(tipoDb)
-    res.status(200).json('Pokemon creado')
+    res.status(200).send('Pokemon creado')
 
 })
 
