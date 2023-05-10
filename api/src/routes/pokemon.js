@@ -1,90 +1,84 @@
-const {Router} = require('express')
-const {getAllPoke} = require('../controllers/pokemonController.js');
-const { Pokemon, Type} = require('../db')
+const pokemonRouter = require("express").Router();
+const { Pokemon, Type } = require("../db");
+const { validate } = require("uuid");
+const { getPokemonTypesFromDb } = require("../utils/globals");
+const getPokemonData = require("../controllers/pokemonController");
+const getPokemonById = require("../controllers/pokemonController");
+const getPokemonByName = require("../controllers/pokemonController");
 
-const router = Router()
+pokemonRouter.post("/", async (req, res) => {
+  try {
+    const { name, image, hp, attack, defense, speed, height, weight, types } =
+      req.body;
 
+    // find type ids on db
+    const filteredDbTypes = (await Type.findAll()).filter((type) =>
+      types.includes(type.name)
+    );
+    const typeIds = filteredDbTypes.map((type) => type.id);
+    console.log(typeIds);
 
+    if (!typeIds.length)
+      throw Error(`Types table must be initialized before Pokemons table.`);
 
-router.get('/', async (req, res) => {
-    try {
+    const newPokemon = await Pokemon.create({
+      name,
+      image,
+      hp,
+      attack,
+      defense,
+      speed,
+      height,
+      weight,
+    });
+    await newPokemon.addTypes(typeIds);
 
-        return res.status(200).send(await getAllPoke());
-
-    } catch (error) {
-        return res.status(404).send('Pokemon no encontrado');
+    res.status(200).json({ ...newPokemon.dataValues, types: types });
+  } catch (error) {
+    res.status(404).json(error.message);
+  }
+});
+pokemonRouter.get("/", async (req, res) => {
+  let { name } = req.query;
+  try {
+    // no query
+    if (!name) {
+      const allPokemons = await getPokemonData();
+      return res.status(200).json(allPokemons);
     }
+    // query
+    const pokemon = await getPokemonByName(name);
+    if (!pokemon) throw Error(`There is no pokemon named "${name}".`);
+    return res.status(200).json(pokemon);
+  } catch (error) {
+    res.status(404).send(error.message);
+  }
+});
+pokemonRouter.get("/:idPokemon", async (req, res) => {
+  const { idPokemon } = req.params;
+  try {
+    // first i have to validate the UUID
+    if (validate(idPokemon)) {
+      // in db?
+      const pokemonInDb = await Pokemon.findByPk(idPokemon);
+
+      if (pokemonInDb) {
+        const pokemonTypes = await getPokemonTypesFromDb(pokemonInDb);
+        console.log(pokemonTypes);
+        return res
+          .status(200)
+          .json({ ...pokemonInDb.dataValues, types: pokemonTypes });
+      }
+    }
+    if (!parseInt(idPokemon)) throw Error(`ID must be an integer or a UUID.`);
+    // in api?
+    const pokemonInApi = await getPokemonById(idPokemon);
+    if (!pokemonInApi)
+      throw Error(`The pokemon with ID ${idPokemon} does not exist.`);
+    return res.status(200).json(pokemonInApi);
+  } catch (error) {
+    res.status(404).send(error.message);
+  }
 });
 
-
-
-router.get('/:id', async (req, res) => {
-    const { id } = req.params;
-    const allPokemons = await getAllPoke();
-    try {
-        if (id) {
-            const pokemonId = await allPokemons.filter(e => e.id == id);
-            pokemonId.length 
-                ? res.status(200).json(pokemonId) 
-                : res.status(404).send('Pokemon no encontrado')
-        }
-    } catch (error) {
-        console.log(error);
-    }
-})
-
-
-router.get('/pokemon/:name', async (req, res) => {
-    const { name } = req.params;
-    const allPokemons = await getAllPoke();
-    try {
-        if (name) {
-            const pokemonName = await allPokemons.filter(e => e.name == name);
-            pokemonName.length 
-             ? res.status(200).json(pokemonName) 
-             : res.status(404).send('Pokemon no encontrado')
-        }
-    } catch (error) {
-        console.log(error);
-    }
-})
-
-//POSTEO DE NUEVOS POKEMONES EN LA BASE DE DATOS
-
-router.post('/', async (req, res) => {
-    const {
-        nombre,
-        vida,
-        fuerza,
-        defensa,
-        velocidad,
-        altura,
-        peso,
-        imagen,
-        createdInDb,
-        type
-    } = req.body 
-    const newPokemon = await Pokemon.create({
-        nombre,
-        vida,
-        fuerza,
-        defensa,
-        velocidad,
-        altura,
-        peso,
-        imagen,
-        createdInDb
-    }) 
-    const tipoDb = await Type.findAll({
-        where: {
-            nombre: type
-        }
-    }) 
-    newPokemon.addType(tipoDb)
-    res.status(200).send('Pokemon creado')
-
-})
-
-
-
-module.exports = router;
+module.exports = pokemonRouter;

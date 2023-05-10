@@ -1,33 +1,34 @@
-const axios = require('axios');
-const {Type} = require('../db');
-const {API_POKEMON_TYPE} = require('../utils/globals');
+const axios = require('axios'); 
+const { Type } = require('../db');
 
 
-const addTypeDb = async () => {
+//types de API
+const getTypeData = async () => {
     try {
-        const allTypes = await Type.findAll()
-        if (allTypes.length > 0) {
-            return null
-        }
-        const reqType = await axios.get(API_POKEMON_TYPE)
-        const resType = reqType.data.results
-        resType.map(e => {
-            Type.create({
-                nombre: e.name
-            })
-        })
-    } catch (err) {
-        console.log(err)
+      const allTypes = (
+        await axios("https://pokeapi.co/api/v2/type")
+      ).data.results.map((type) => {
+        return { name: type.name };
+      });
+      return allTypes;
+    } catch (error) {
+      throw Error(error.message);
     }
-}
-addTypeDb()
+  };
+
+  const saveTypeData = async (allTypes) => {
+    try {
+      const savedTypes = await Type.bulkCreate(allTypes);
+  
+      return savedTypes;
+    } catch (error) {
+      throw Error(error.message);
+    }
+  };
 
 
-const getTypeApi = async () => {
-    const result = await Type.findAll();
-    return result;
-}
 
 module.exports = {
-    getTypeApi
-};
+    getTypeData,
+    saveTypeData,
+}

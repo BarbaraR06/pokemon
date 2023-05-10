@@ -7,7 +7,7 @@ module.exports = (sequelize) => {
   sequelize.define('Pokemon', {
     
     id: {
-      type: DataTypes.UUID,
+      type: DataTypes.UUID, //para que genere un ID único
       defaultValue: DataTypes.UUIDV4,
       allowNull: false,
       primaryKey: true,
@@ -16,6 +16,7 @@ module.exports = (sequelize) => {
     nombre: {
       type: DataTypes.STRING,
       allowNull: false,
+      unique: true,
     },
 
     imagen: {
@@ -25,22 +26,22 @@ module.exports = (sequelize) => {
 
     vida: { 
       type: DataTypes.INTEGER,
-      allowNull: false
+      allowNull: false,
     },
 
     fuerza: {
       type: DataTypes.INTEGER,
-      allowNull: false
+      allowNull: false,
     }, 
 
     defensa: {
       type: DataTypes.INTEGER,
-      allowNull: false
+      allowNull: false,
     },
 
     velocidad: {
       type: DataTypes.INTEGER,
-      allowNull: false
+      allowNull: false,
     },
 
     altura: {
@@ -62,7 +63,8 @@ module.exports = (sequelize) => {
   },
 
   {
-    timestamps: false
+    timestamps: false,
+    freezeTableName: true,
   }
   
   );
