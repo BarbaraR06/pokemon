@@ -5,14 +5,15 @@ const { DataTypes } = require('sequelize');
 module.exports = (sequelize) => {
 
  sequelize.define(
-    "Pokemon",
+    "pokemon",
     {
       id: {
         type: DataTypes.UUID,
         defaultValue: DataTypes.UUIDV4,
         primaryKey: true,
+        allowNull: false,
       },
-      name: {
+      nombre: {
         type: DataTypes.STRING,
         allowNull: false,
       },
@@ -20,27 +21,32 @@ module.exports = (sequelize) => {
         type: DataTypes.STRING,
         allowNull: false,
       },
-      hp: {
+      vida: {
         type: DataTypes.INTEGER,
         allowNull: false,
       },
-      attack: {
+      ataque: {
         type: DataTypes.INTEGER,
         allowNull: false,
       },
-      defense: {
+      defensa: {
         type: DataTypes.INTEGER,
         allowNull: false,
       },
-      speed: {
+      velocidad: {
         type: DataTypes.INTEGER,
       },
-      height: {
+      altura: {
         type: DataTypes.INTEGER,
       },
-      weight: {
+      peso: {
         type: DataTypes.INTEGER,
-      }
+      },
+      createdInDb: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: true,
+      },
     },
     { timestamps: false }
   );

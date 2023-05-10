@@ -1,89 +1,92 @@
-const axios = require("axios");
-const { parsePokemon, getPokemonTypesFromDb } = require("../utils/globals");
-const { Pokemon } = require("../db");
+const axios = require('axios');
+const {Pokemon,Type} = require('../db');
+const {API_POKEMON} = require('../utils/globales');
 
 
-//trae los pokemons de la db
-const getPokemonData = async () => {
-  try {
-    const pokemonsInDb = await Pokemon.findAll();
+// 1 TRAE TODOS LOS OBJETOS DE LA API DE A CUANTO SEA QUE LOS LLAME DESDE LA URL
+const getPokeapi = async () => { //Llamado doble a la api y a su suburl para traer todos los datos
+    try {
+        const pokemonsRequest = await axios.get(API_POKEMON);
+        //me devuelve los pokemons traidos con un name y una url de cada pokemon
+        const pokemonsSubrequest = pokemonsRequest.data.results.map(obj => axios.get(obj.url));
+        //hago el axios pero a la sub url TERMINAR DE VER COMO FUNCIONA EL data.results.map
+        const infoUrlPokemons = await axios.all(pokemonsSubrequest);
+        //llama a todas las sub url, solicitudes simultaneas 
+        let pokemons = infoUrlPokemons.map(obj => obj.data);
+        //obtengo la data de cada pokemon por su suburl
+        let informacionPokemons = pokemons.map(pokemon => objPokeApi(pokemon))
+        return informacionPokemons
 
-    const pokemonsInDbCompletos = await Promise.all(
-      pokemonsInDb.map(async (pokemonInDb) => {
-
-        const pokemonTypes = await getPokemonTypesFromDb(pokemonInDb);
-        
-        const pokemonCompleto = {
-          ...pokemonInDb.dataValues,
-          types: pokemonTypes,
-        };
-        return pokemonCompleto;
-      })
-    );
-
-    // api pokemons
-    const pokemonPromises = [];
-    let i = 1;
-
-    while (i <= 10) {
-      let apiData = await axios(`https://pokeapi.co/api/v2/pokemon/${i}`);
-      pokemonPromises.push(apiData);
-      i++;
+    } catch (error) {
+        console.log(error);
+        return error;
     }
+};
+const objPokeApi = (poke) => { // Con la informacion de los pokemons traída en informacionPokemons se creán objetos de Pokemones
 
-    const rawPokemons = (await Promise.all(pokemonPromises)).map(
-      (response) => response.data
-    );
-    const parsedPokemons = rawPokemons.map((pokemon) => parsePokemon(pokemon));
-
-    const allPokemons = [...pokemonsInDbCompletos, ...parsedPokemons];
-
-    return allPokemons;
-  } catch (error) {
-    throw Error(error.message);
-  }
+    const objPokeapi = {
+        id: poke.id,
+        name: poke.name,
+        life: poke.stats[0].base_stat,
+        attack: poke.stats[1].base_stat,
+        defense: poke.stats[2].base_stat,
+        speed: poke.stats[5].base_stat,
+        height: poke.height,
+        weight: poke.weight,
+        sprite: poke.sprites.other.dream_world.front_default,
+        types: poke.types.length < 2 ? [poke.types[0].type.name] : [poke.types[0].type.name, poke.types[1].type.name],
+    };
+    return objPokeapi
 };
 
-//trae los pokemons por id
-const getPokemonById = async (id) => {
+// 2 TRAE LOS POKEMONES DE LA BASE DE DATOS
+const getPokedb = async () => {
+
+    const pokemonDb = await Pokemon.findAll({
+        include: Type
+    });
+
+    const objPokeDb = pokemonDb.map(pokemonDb => {
+        return {
+            id: pokemonDb.dataValues.id,
+            name: pokemonDb.dataValues.nombre,
+            life: pokemonDb.dataValues.vida,
+            attack: pokemonDb.dataValues.fuerza,
+            defense: pokemonDb.dataValues.defensa,
+            speed: pokemonDb.dataValues.velocidad,
+            height: pokemonDb.dataValues.altura,
+            weight: pokemonDb.dataValues.peso,
+            sprite: pokemonDb.dataValues.imagen,
+            types: pokemonDb.dataValues.types?.map(e => e.nombre),
+            createdInDb: pokemonDb.dataValues.createdInDb
+        };
+    })
+
     try {
-      // api
-      const rawPokemon = (await axios(`https://pokeapi.co/api/v2/pokemon/${id}`))
-        .data;
-      const pokemon = parsePokemon(rawPokemon);
-      return pokemon;
-    } catch (error) {
-      return false;
+        return objPokeDb
+    } catch (err) {
+        console.log(err);
     }
-  };
+}
 
-  const getPokemonByName = async (name) => {
+
+// 3 UNION DE TODOS LOS POKEMONES DE API Y BASE DE DATOS
+//me permite unir el array que me devuelve la pokeapi (40) pokemons + los pokemons creados en la DB pokemons
+
+
+const getAllPoke = async () => {
     try {
-      const nameNormalized = name.toLowerCase();
+        const apiPokeData = await getPokeapi();
+        const dbPokeData = await getPokedb();
+        return [...apiPokeData, ...dbPokeData];
 
-      const pokemonInDb = await Pokemon.findOne({
-        where: { name: nameNormalized },
-      });
-      if (pokemonInDb) {
-        const pokemonTypes = await getPokemonTypesFromDb(pokemonInDb)
-        console.log(pokemonTypes);
-        return { ...pokemonInDb.dataValues, types: pokemonTypes };
-      }
-  
-      // in api?
-      const rawPokemon = (
-        await axios(`https://pokeapi.co/api/v2/pokemon/${nameNormalized}`)
-      ).data;
-      const pokemon = parsePokemon(rawPokemon);
-      return pokemon;
     } catch (error) {
-      console.log(error.message);
+        console.log(error);
+        return error;
     }
-  };
-  
+};
 
 
-module.exports = 
-getPokemonData, 
-getPokemonById,
-getPokemonByName;
+module.exports = {
+    getAllPoke,
+}

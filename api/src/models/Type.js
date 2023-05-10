@@ -2,7 +2,7 @@ const { DataTypes } = require("sequelize");
 
 module.exports = (sequelize) => {
   sequelize.define(
-    "Type",
+    "type",
     {
       id: {
         type: DataTypes.INTEGER,
@@ -11,7 +11,7 @@ module.exports = (sequelize) => {
       },
       name: {
         type: DataTypes.STRING,
-        allowNull: false,
+        unique: true,
       },
     },
     { timestamps: false }

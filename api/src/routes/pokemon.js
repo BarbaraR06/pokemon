@@ -1,84 +1,97 @@
-const pokemonRouter = require("express").Router();
-const { Pokemon, Type } = require("../db");
-const { validate } = require("uuid");
-const { getPokemonTypesFromDb } = require("../utils/globals");
-const getPokemonData = require("../controllers/pokemonController");
-const getPokemonById = require("../controllers/pokemonController");
-const getPokemonByName = require("../controllers/pokemonController");
+const {Router} = require('express')
+const {getAllPoke} = require('../controllers/pokemonController');
+const { Pokemon, Type} = require('../db')
 
-pokemonRouter.post("/", async (req, res) => {
-  try {
-    const { name, image, hp, attack, defense, speed, height, weight, types } =
-      req.body;
+const router = Router()
 
-    // find type ids on db
-    const filteredDbTypes = (await Type.findAll()).filter((type) =>
-      types.includes(type.name)
-    );
-    const typeIds = filteredDbTypes.map((type) => type.id);
-    console.log(typeIds);
+// 1 TRAE TODOS LOS POKEMONES DE BASE DE DATOS Y DE API CON EL LLAMADO HTTP
+//UTILIZANDO LA FUNCION getAllPoke traída de pokemonController
 
-    if (!typeIds.length)
-      throw Error(`Types table must be initialized before Pokemons table.`);
+router.get('/', async (req, res) => {
+    try {
 
-    const newPokemon = await Pokemon.create({
-      name,
-      image,
-      hp,
-      attack,
-      defense,
-      speed,
-      height,
-      weight,
-    });
-    await newPokemon.addTypes(typeIds);
+        return res.status(200).send(await getAllPoke());
 
-    res.status(200).json({ ...newPokemon.dataValues, types: types });
-  } catch (error) {
-    res.status(404).json(error.message);
-  }
-});
-pokemonRouter.get("/", async (req, res) => {
-  let { name } = req.query;
-  try {
-    // no query
-    if (!name) {
-      const allPokemons = await getPokemonData();
-      return res.status(200).json(allPokemons);
+    } catch (error) {
+        console.log('entro error');
+        return res.status(404).send('Pokemons not found');
     }
-    // query
-    const pokemon = await getPokemonByName(name);
-    if (!pokemon) throw Error(`There is no pokemon named "${name}".`);
-    return res.status(200).json(pokemon);
-  } catch (error) {
-    res.status(404).send(error.message);
-  }
 });
-pokemonRouter.get("/:idPokemon", async (req, res) => {
-  const { idPokemon } = req.params;
-  try {
-    // first i have to validate the UUID
-    if (validate(idPokemon)) {
-      // in db?
-      const pokemonInDb = await Pokemon.findByPk(idPokemon);
 
-      if (pokemonInDb) {
-        const pokemonTypes = await getPokemonTypesFromDb(pokemonInDb);
-        console.log(pokemonTypes);
-        return res
-          .status(200)
-          .json({ ...pokemonInDb.dataValues, types: pokemonTypes });
-      }
+//BUSCA LOS POKEMONS POR SUS ID PRIMERO LLAMANDO A LA FUNCION getAllPoke
+//LUEGO FILTRA EL OBJETO CREADO A PARTIR DE LA FUNCION POR SUS ID
+
+router.get('/:id', async (req, res) => {
+    const { id } = req.params;
+    const allPokemons = await getAllPoke();
+    try {
+        if (id) {
+            const pokemonId = await allPokemons.filter(e => e.id == id);
+            pokemonId.length ?
+                res.status(200).json(pokemonId) :
+                res.status(404).send('Pokemon not found')
+        }
+    } catch (error) {
+        console.log(error);
     }
-    if (!parseInt(idPokemon)) throw Error(`ID must be an integer or a UUID.`);
-    // in api?
-    const pokemonInApi = await getPokemonById(idPokemon);
-    if (!pokemonInApi)
-      throw Error(`The pokemon with ID ${idPokemon} does not exist.`);
-    return res.status(200).json(pokemonInApi);
-  } catch (error) {
-    res.status(404).send(error.message);
-  }
-});
+})
 
-module.exports = pokemonRouter;
+//BUSCA LOS POKEMONS POR SUS ID PRIMERO LLAMANDO A LA FUNCION getAllPoke
+//LUEGO FILTRA EL OBJETO CREADO A PARTIR DE LA FUNCION POR SUS NAME
+
+router.get('/pokemon/:name', async (req, res) => {
+    const { name } = req.params;
+    const allPokemons = await getAllPoke();
+    try {
+        if (name) {
+            const pokemonName = await allPokemons.filter(e => e.name == name);
+            pokemonName.length ?
+                res.status(200).json(pokemonName) :
+                res.status(404).send('Pokemon no encontrado')
+        }
+    } catch (error) {
+        console.log(error);
+    }
+})
+
+//POSTEO DE NUEVOS POKEMONES EN LA BASE DE DATOS
+
+router.post('/', async (req, res) => {
+    const {
+        nombre,
+        vida,
+        fuerza,
+        defensa,
+        velocidad,
+        altura,
+        peso,
+        imagen,
+        createdInDb,
+        type
+    } = req.body //indica los parametros pertenecientes al body en el JSON
+
+    let newPokemon = await Pokemon.create({
+        nombre,
+        vida,
+        fuerza,
+        defensa,
+        velocidad,
+        altura,
+        peso,
+        imagen,
+        createdInDb
+    },{ validate: true }) //creador del nuevo Pokemon en la base de datos
+
+    let tipoDb = await Type.findAll({
+        where: {
+            nombre: type
+        }
+    }) //busca todos los tipos de pokemones en la base de datos
+
+    newPokemon.addType(tipoDb)
+    res.send('El pokemon ha sido creado con éxito')
+})// agrega el tipo al nuevo pokemon
+
+
+
+module.exports = router

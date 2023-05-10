@@ -24,12 +24,12 @@ const modelDefiners = [];
 typeModel (sequelize);
 pokemonModel (sequelize);
 
-const { Pokemon, Type } = sequelize.models;
+const { pokemon, type } = sequelize.models;
 
 
 
-Pokemon.belongsToMany(Type, { through: 'pokemon-type' });
-Type.belongsToMany(Pokemon, { through: 'pokemon-type' });
+pokemon.belongsToMany(type, { through: 'pokemon-type' });
+type.belongsToMany(pokemon, { through: 'pokemon-type' });
 
 
 // Leemos todos los archivos de la carpeta Models, los requerimos y agregamos al arreglo modelDefiners

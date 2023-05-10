@@ -1,22 +1,15 @@
-const typeRouter = require("express").Router();
-const { Type } = require("../db");
-const getTypeData = require("../controllers/pokemonController");
-const saveTypeData = require("../controllers/typeController");
+const { Router } = require('express');
+const { getTypeApi } = require('../controllers/typeController');
+const axios = require('axios');
 
-typeRouter.get("/", async (req, res) => {
-  try {
-    // db
-    const dbTypes = await Type.findAll();
-    if (Object.keys(dbTypes).length) {
-      return res.status(200).json(dbTypes);
-    }
-    // if no db, then api saves to db
-    const allTypes = await getTypeData();
-    const savedTypes = await saveTypeData(allTypes);
-    return res.status(200).json(savedTypes);
-  } catch (error) {
-    res.status(404).send(error.message);
-  }
-});
 
-module.exports = typeRouter;
+const router = Router()
+
+router.get('/', async (req, res) => {
+    const resultType = await getTypeApi()
+    res.json(resultType)
+})
+
+module.exports = router;
+
+
