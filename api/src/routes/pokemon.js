@@ -9,12 +9,9 @@ const router = Router()
 
 router.get('/', async (req, res) => {
     try {
-
-        return res.status(200).send(await getAllPoke());
-
+     return res.status(200).send(await getAllPoke());
     } catch (error) {
-        console.log('entro error');
-        return res.status(404).send('Pokemons not found');
+        return res.status(404).send('Pokemon not found');
     }
 });
 
@@ -26,10 +23,10 @@ router.get('/:id', async (req, res) => {
     const allPokemons = await getAllPoke();
     try {
         if (id) {
-            const pokemonId = await allPokemons.filter(e => e.id == id);
-            pokemonId.length ?
-                res.status(200).json(pokemonId) :
-                res.status(404).send('Pokemon not found')
+            const pokemonId = await allPokemons.filter(event => event.id === id);
+            pokemonId.length 
+            ? res.status(200).json(pokemonId) 
+            : res.status(404).send('Pokemon not found')
         }
     } catch (error) {
         console.log(error);
@@ -45,9 +42,9 @@ router.get('/pokemon/:name', async (req, res) => {
     try {
         if (name) {
             const pokemonName = await allPokemons.filter(e => e.name == name);
-            pokemonName.length ?
-                res.status(200).json(pokemonName) :
-                res.status(404).send('Pokemon no encontrado')
+            pokemonName.length 
+            ? res.status(200).json(pokemonName) 
+            : res.status(404).send('Pokemon no encontrado')
         }
     } catch (error) {
         console.log(error);

@@ -6,7 +6,11 @@ const { Pokemon, conn } = require('../../src/db.js');
 
 const agent = session(app);
 const pokemon = {
-  name: 'Pikachu',
+  nombre: 'Pikachu',
+  imagen: 5,
+  vida: 40,
+  ataque: 5, 
+  defensa: 5,
 };
 
 describe('Pokemon routes', () => {

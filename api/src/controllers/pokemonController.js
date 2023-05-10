@@ -26,14 +26,14 @@ const objPokeApi = (poke) => { // Con la informacion de los pokemons traída en 
 
     const objPokeapi = {
         id: poke.id,
-        name: poke.name,
-        life: poke.stats[0].base_stat,
-        attack: poke.stats[1].base_stat,
-        defense: poke.stats[2].base_stat,
-        speed: poke.stats[5].base_stat,
-        height: poke.height,
-        weight: poke.weight,
-        sprite: poke.sprites.other.dream_world.front_default,
+        nombre: poke.name,
+        vida: poke.stats[0].base_stat,
+        ataque: poke.stats[1].base_stat,
+        defensa: poke.stats[2].base_stat,
+        velocidad: poke.stats[5].base_stat,
+        altura: poke.altura,
+        peso: poke.peso,
+        imagen: poke.sprites.other.dream_world.front_default,
         types: poke.types.length < 2 ? [poke.types[0].type.name] : [poke.types[0].type.name, poke.types[1].type.name],
     };
     return objPokeapi
@@ -51,12 +51,12 @@ const getPokedb = async () => {
             id: pokemonDb.dataValues.id,
             name: pokemonDb.dataValues.nombre,
             life: pokemonDb.dataValues.vida,
-            attack: pokemonDb.dataValues.fuerza,
-            defense: pokemonDb.dataValues.defensa,
-            speed: pokemonDb.dataValues.velocidad,
-            height: pokemonDb.dataValues.altura,
-            weight: pokemonDb.dataValues.peso,
-            sprite: pokemonDb.dataValues.imagen,
+            ataque: pokemonDb.dataValues.fuerza,
+            defensa: pokemonDb.dataValues.defensa,
+            velocidad: pokemonDb.dataValues.velocidad,
+            altura: pokemonDb.dataValues.altura,
+            peso: pokemonDb.dataValues.peso,
+            imagen: pokemonDb.dataValues.imagen,
             types: pokemonDb.dataValues.types?.map(e => e.nombre),
             createdInDb: pokemonDb.dataValues.createdInDb
         };
