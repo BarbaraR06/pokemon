@@ -4,68 +4,44 @@ const { DataTypes } = require('sequelize');
 
 module.exports = (sequelize) => {
 
-  sequelize.define('Pokemon', {
-    
-    id: {
-      type: DataTypes.UUID, //para que genere un ID único
-      defaultValue: DataTypes.UUIDV4,
-      allowNull: false,
-      primaryKey: true,
+ sequelize.define(
+    "Pokemon",
+    {
+      id: {
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4,
+        primaryKey: true,
+      },
+      name: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      image: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      hp: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
+      attack: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
+      defense: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
+      speed: {
+        type: DataTypes.INTEGER,
+      },
+      height: {
+        type: DataTypes.INTEGER,
+      },
+      weight: {
+        type: DataTypes.INTEGER,
+      }
     },
-
-    nombre: {
-      type: DataTypes.STRING,
-      allowNull: false,
-      unique: true,
-    },
-
-    imagen: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-
-    vida: { 
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
-
-    fuerza: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    }, 
-
-    defensa: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
-
-    velocidad: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
-
-    altura: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
-
-    peso: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
-
-    createdInDb: {
-      type: DataTypes.BOOLEAN,
-      allowNull: false,
-      defaultValue: true,
-    },
-
-  },
-
-  {
-    timestamps: false,
-    freezeTableName: true,
-  }
-  
+    { timestamps: false }
   );
 };

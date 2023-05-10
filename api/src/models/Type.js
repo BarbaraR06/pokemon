@@ -1,21 +1,19 @@
 const { DataTypes } = require("sequelize");
 
 module.exports = (sequelize) => {
-  sequelize.define( 'Type',
+  sequelize.define(
+    "Type",
     {
-      nombre: {
+      id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+      },
+      name: {
         type: DataTypes.STRING,
-        unique: true,
         allowNull: false,
+      },
     },
-    id: {
-      type: DataTypes.UUID, //para que genere un ID único
-      defaultValue: DataTypes.UUIDV4,
-      allowNull: false,
-      primaryKey: true,
-    },
-}, {
-    timestamps: false,
-    freezeTableName: true,
-})
+    { timestamps: false }
+  );
 };
