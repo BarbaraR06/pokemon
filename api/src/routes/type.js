@@ -1,6 +1,6 @@
 const { Router } = require('express');
 const { getTypeApi } = require('../controllers/typeController');
-const axios = require('axios');
+
 
 
 const router = Router()
