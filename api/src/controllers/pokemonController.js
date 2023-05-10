@@ -3,17 +3,17 @@ const {Pokemon,Type} = require('../db');
 const {API_POKEMON} = require('../utils/globals');
 
 
-// 1 TRAE TODOS LOS OBJETOS DE LA API DE A CUANTO SEA QUE LOS LLAME DESDE LA URL
-const getPokeapi = async () => { //Llamado doble a la api y a su suburl para traer todos los datos
+
+const getPokeapi = async () => { 
     try {
         const pokemonsRequest = await axios.get(API_POKEMON);
-        //me devuelve los pokemons traidos con un name y una url de cada pokemon
+        
         const pokemonsSubrequest = pokemonsRequest.data.results.map(obj => axios.get(obj.url));
-        //hago el axios pero a la sub url TERMINAR DE VER COMO FUNCIONA EL data.results.map
+        
         const infoUrlPokemons = await axios.all(pokemonsSubrequest);
-        //llama a todas las sub url, solicitudes simultaneas 
+
         let pokemons = infoUrlPokemons.map(obj => obj.data);
-        //obtengo la data de cada pokemon por su suburl
+
         let informacionPokemons = pokemons.map(pokemon => objPokeApi(pokemon))
         return informacionPokemons
 
@@ -22,7 +22,7 @@ const getPokeapi = async () => { //Llamado doble a la api y a su suburl para tra
         return error;
     }
 };
-const objPokeApi = (poke) => { // Con la informacion de los pokemons traída en informacionPokemons se creán objetos de Pokemones
+const objPokeApi = (poke) => { 
 
     const objPokeapi = {
         id: poke.id,
@@ -39,45 +39,8 @@ const objPokeApi = (poke) => { // Con la informacion de los pokemons traída en 
     return objPokeapi
 };
 
-// const createPokemon = async (req, res) => {
-//   const { nombre, vida, fuerza, defensa, velocidad, altura, peso } = req.body;
 
-//   try {
-//     const newPokemon = await Pokemon.create({
-//       nombre,
-//       vida,
-//       fuerza,
-//       defensa,
-//       velocidad,
-//       altura,
-//       peso,
-//     });
-//     res.status(200).json(newPokemon);
-//   } catch (error) {
-//     console.error(error);
-//     res.status(404).json({ message: 'Error al crear un nuevo Pokemon' });
-    
-//   }
-// }
 
-// const createPokemon = async (nombre, vida, fuerza, defensa, velocidad, altura, peso) => {
-//     try {
-//       const newPokemon = await Pokemon.create({
-//         nombre,
-//         vida,
-//         fuerza,
-//         defensa,
-//         velocidad,
-//         altura,
-//         peso,
-//       });
-//       return newPokemon;
-//     } catch (error) {
-//       console.log(error);
-//     }
-//   };
-
-// 2 TRAE LOS POKEMONES DE LA BASE DE DATOS
 
 const getPokedb = async () => {
 
@@ -107,10 +70,6 @@ const getPokedb = async () => {
         console.log(err);
     }
 }
-
-
-// 3 UNION DE TODOS LOS POKEMONES DE API Y BASE DE DATOS
-//me permite unir el array que me devuelve la pokeapi (40) pokemons + los pokemons creados en la DB pokemons
 
 
 const getAllPoke = async () => {
