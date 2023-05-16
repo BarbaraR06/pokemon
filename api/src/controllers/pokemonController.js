@@ -22,7 +22,7 @@ const getPokeapi = async () => { //Llamado doble a la api y a su suburl para tra
         return error;
     }
 };
-const objPokeApi = (poke) => { // Con la informacion de los pokemons traída en informacionPokemons se creán objetos de Pokemones
+const objPokeApi = (poke) => { 
 
     const objPokeapi = {
         id: poke.id,
