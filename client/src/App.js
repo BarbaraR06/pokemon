@@ -14,9 +14,9 @@ function App() {
 
       <Router>
         <Route exact path='/' render={() => <LandingPage />} />
-        <Route exact path='/home' render={() => <Home />} />
-        <Route exact path='/pokemons/:id' render={() => <Detail />} />
-        <Route exact path='/pokemon' render={() => <CreatePokemon />} />
+        <Route path='/home' render={() => <Home />} />
+        <Route path='/pokemons/:id' render={() => <Detail />} />
+        <Route path='/pokemon' render={() => <CreatePokemon />} />
       </Router>
 
     </div >

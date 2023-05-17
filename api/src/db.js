@@ -1,10 +1,9 @@
 require('dotenv').config();
-const { Sequelize } = require('sequelize');
+const { Sequelize, DataTypes } = require('sequelize');
 const fs = require('fs');
 const path = require('path');
 const { DB_USER, DB_PASSWORD, DB_HOST } = process.env;
-const pokemonModel = require ('./models/Pokemon');
-const typeModel = require ('./models/Type')
+
 
 
 const sequelize = new Sequelize(
@@ -18,18 +17,6 @@ const sequelize = new Sequelize(
 const basename = path.basename(__filename);
 
 const modelDefiners = [];
-
-//const { pokemon, type} = sequelize.models;
-
-typeModel (sequelize);
-pokemonModel (sequelize);
-
-const { pokemon, type } = sequelize.models;
-
-
-
-pokemon.belongsToMany(type, { through: 'pokemon-type' });
-type.belongsToMany(pokemon, { through: 'pokemon-type' });
 
 
 // Leemos todos los archivos de la carpeta Models, los requerimos y agregamos al arreglo modelDefiners
@@ -53,6 +40,11 @@ let capsEntries = entries.map((entry) => [
    entry[1],
 ]);
 sequelize.models = Object.fromEntries(capsEntries);
+
+const { Pokemons, Types } = sequelize.models;
+
+Pokemons.belongsToMany(Types, { through: 'pokemon_type' });
+Types.belongsToMany(Pokemons, { through: 'pokemon_type' });
 
 
 module.exports = {
