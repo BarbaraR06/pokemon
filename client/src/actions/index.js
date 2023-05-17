@@ -11,13 +11,13 @@ import axios from 'axios';
 //TRAE LOS POKEMONES DE LA API
 export function getPokemons(){
     return async function(dispatch){
-        const pokeDex = await axios.get('/pokemons');
+        const pokeDex = await axios.get("/pokemons");
         //TRAE TODOS LOS POKEMONES AL HOME CON SUS TIPOS E IMAGENES
         return dispatch({
             type: 'GET_POKEMONS', //type: describe lo que queremos hacer
             payload: pokeDex.data 
-        })        
-    }
+        });        
+    };
 }
 
 
@@ -26,8 +26,11 @@ export function getPokemons(){
 // para los filtros
 export function getTypes() {
     return async function (dispatch) {
-      const info = await axios.get('/types');
-        return dispatch({ type: "GET_TYPES",  payload: info.data });
+        const info = await axios.get("/types");
+        return dispatch({ 
+            type: "GET_TYPES", 
+            payload: info.data 
+        });
     };
 }
 
@@ -68,11 +71,11 @@ export function orderByAttack(payload) {
 }
 
 //BUSQUEDA POR NOMBRE
-// para los filtros
+
 export function getNamePokemons(name){
     return async function (dispatch){
         try{
-            let json = await axios.get("/pokemons/pokemon/" + name);
+            let json = await axios.get(`/pokemons/pokemon/`+ name);
                 return dispatch({
                     type: "GET_NAME_POKEMONS",
                     payload: json.data

@@ -1,6 +1,3 @@
-//el reducer sirve para describir las acciones
-
-
 const initialState = {
     pokemons: [],
     allPokemons: [],

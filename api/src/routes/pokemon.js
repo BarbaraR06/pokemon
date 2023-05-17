@@ -1,8 +1,7 @@
-const {Router} = require('express')
+const {Router} = require('express');
 const {getAllPoke} = require('../controllers/pokemonController');
-const { Pokemon, Type} = require('../db')
-
-const router = Router()
+const { Pokemon, Type} = require('../db');
+const router = Router();
 
 // 1 TRAE TODOS LOS POKEMONES DE BASE DE DATOS Y DE API CON EL LLAMADO HTTP
 //UTILIZANDO LA FUNCION getAllPoke traída de pokemonController
@@ -41,10 +40,10 @@ router.get('/pokemons/:name', async (req, res) => {
     const allPokemons = await getAllPoke();
     try {
         if (name) {
-            const pokemonName = await allPokemons.filter(e => e.name == name);
-            pokemonName.length 
+            const pokemonName = allPokemons.filter(e => e.name.toLowerCase() === name.toLowerCase());
+            pokemonName 
             ? res.status(200).json(pokemonName) 
-            : res.status(404).send('Pokemon no encontrado')
+            : res.status(404).send('Pokemon not found')
         }
     } catch (error) {
         console.log(error);
@@ -91,4 +90,4 @@ router.post('/', async (req, res) => {
 
 
 
-module.exports = router
+module.exports = router;
