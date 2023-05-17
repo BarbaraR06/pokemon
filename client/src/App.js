@@ -4,11 +4,9 @@ import { Route, BrowserRouter as Router,} from 'react-router-dom';
 import LandingPage from './componentes/LandingPage/landingPage'
 import Home from './componentes/Home/home'
 import CreatePokemon from './componentes/CreatePokemon/createPokemon'
-import Card from './componentes/Card/Card'
-
+import Detail from './componentes/Detail/Detail';
 
 function App() {
-
 
   return (
 
@@ -17,7 +15,7 @@ function App() {
       <Router>
         <Route exact path='/' render={() => <LandingPage />} />
         <Route exact path='/home' render={() => <Home />} />
-        <Route exact path='/pokemon/:id' render={() => <Card />} />
+        <Route exact path='/pokemons/:id' render={() => <Detail />} />
         <Route exact path='/pokemon' render={() => <CreatePokemon />} />
       </Router>
 

@@ -3,7 +3,6 @@
 // solo ingresa al store si es enviada mediante la funcion dispatch
 
 
-
 import axios from 'axios';
 
 
@@ -12,7 +11,7 @@ import axios from 'axios';
 //TRAE LOS POKEMONES DE LA API
 export function getPokemons(){
     return async function(dispatch){
-        const pokeDex = await axios.get("/pokemons");
+        const pokeDex = await axios.get('/pokemons');
         //TRAE TODOS LOS POKEMONES AL HOME CON SUS TIPOS E IMAGENES
         return dispatch({
             type: 'GET_POKEMONS', //type: describe lo que queremos hacer
@@ -35,7 +34,7 @@ export function getTypes() {
 //CREACION DE NUEVO POKEMON
 export function postPokemon(payload) {
     return async function(dispatch){
-        const responseCreated = await axios.post("/pokemons",payload)
+        const responseCreated = await axios.post("/pokemon",payload)
         console.log(responseCreated)
         return responseCreated;
     }

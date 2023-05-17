@@ -36,7 +36,7 @@ router.get('/:id', async (req, res) => {
 //BUSCA LOS POKEMONS POR SUS ID PRIMERO LLAMANDO A LA FUNCION getAllPoke
 //LUEGO FILTRA EL OBJETO CREADO A PARTIR DE LA FUNCION POR SUS NAME
 
-router.get('/pokemon/:name', async (req, res) => {
+router.get('/pokemons/:name', async (req, res) => {
     const { name } = req.params;
     const allPokemons = await getAllPoke();
     try {

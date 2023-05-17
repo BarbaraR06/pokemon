@@ -2,19 +2,29 @@ import { useState, useEffect } from "react";
 import {useDispatch, useSelector} from 'react-redux';
 import { getPokemons, orderByName, filterCreated, orderByAttack, getTypes, filterType } from '../../actions/index';
 import {Link} from 'react-router-dom';
-
 import SearchBar from "../SearchBar/SearchBar";
 import styles from "./home.module.css";
+import Card from "../Card/Card";
+import Paginado from '../Paginado/Paginado'
+
 
 export default function Home(){
     const dispatch = useDispatch()
-
+    const tuttiPokemons = useSelector((state)=> state.pokemons)
     const types = useSelector((state)=> state.types)
 
     //declara constante y trae todo lo que esta en el estado de pokemones, el pokemones del final viene del reducer
     
+   //paginado
+   const [currentPage, setCurrentPage] = useState(1);
+   const [pokemonPerPage, setPokemonPerPage] = useState(12);
+   const indexOfLastPokemon = currentPage * pokemonPerPage;
+   const indexOfFirstPokemon = indexOfLastPokemon - pokemonPerPage; 
+   const currentPokemons = tuttiPokemons.slice(indexOfFirstPokemon, indexOfLastPokemon);
+   const paginado = (pageNumber) => {
+   setCurrentPage(pageNumber) }
 
-
+    
     const [orden, setOrden] = useState('')
 
     function handleClick(e){
@@ -96,12 +106,40 @@ export default function Home(){
             </div>
             {/* CIERRE FILTRADOS */}
    
-            
+            <div>        
+                <Paginado
+                    pokemonPerPage = {pokemonPerPage}
+                    tuttiPokemons={tuttiPokemons.length}
+                    paginado = {paginado}
+                />
+            </div>    
                 <SearchBar/>
 
 
             {/* INICIO DE CARD */}
-            
+            <div className={styles.containerCards}>
+                {currentPokemons.map((ob) => {
+                 return(
+                        <div className={styles.cards}>
+
+                            <Link to ={`/pokemons/${ob.id}`} >
+                                    <Card 
+                                        name={ob.name}
+                                        sprite={ob.sprite}
+                                        types={ob.types}
+                                        key={ob.id}/>
+                            </Link>
+
+                        </div>    
+                        )
+                        
+                })
+                
+                }
+            </div>
+            {/* CIERRE DE CARD */}
+
+
             </div>
 
 
