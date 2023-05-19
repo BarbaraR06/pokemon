@@ -1,5 +1,5 @@
 const axios = require('axios');
-const { Pokemons, Types } = require('../db');
+const { Pokemon, Type } = require('../db');
 const { API_POKEMON } = require('../utils/globales');
 
 
@@ -39,8 +39,8 @@ const objPokeApi = (poke) => {
 // 2 TRAE LOS POKEMONES DE LA BASE DE DATOS
 const getPokedb = async () => {
 
-    const pokemonDb = await Pokemons.findAll({
-        include: Types
+    const pokemonDb = await Pokemon.findAll({
+        include: Type
     });
 
     const objPokeDb = pokemonDb?.map(pokemonDb => {

@@ -3,7 +3,7 @@ import React from 'react';
 import { Route, BrowserRouter as Router,} from 'react-router-dom';
 import LandingPage from './componentes/LandingPage/landingPage'
 import Home from './componentes/Home/home'
-import CreatePokemon from './componentes/CreatePokemon/createPokemon'
+import CreatePokemon from './componentes/CreatePokemon/CreatePokemon'
 import Detail from './componentes/Detail/Detail';
 
 function App() {

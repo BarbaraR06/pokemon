@@ -1,181 +1,243 @@
-import React, {useState,useEffect} from "react";
-import {Link} from 'react-router-dom';
-import {postPokemon, getTypes} from '../../actions/index'
-import { useDispatch ,useSelector } from "react-redux";
-import styles from "./CreatePokemon.module.css";
-import validaciones from '../CreatePokemon/CreatePokemonErrors'
+import { React, useState, useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { NavLink } from 'react-router-dom'
+import style from '../CreatePokemon/CreatePokemon.module.css'
+import { getTypes } from '../../actions/index'
 
+function Add() {
 
-
-
-export default function PokemonCreated(){
-
-    const dispatch = useDispatch()
-    const types = useSelector((state) => state.types)
-    const [errors, setErrors] = useState({});
-
+    let dispatch = useDispatch();
     useEffect(() => {
         dispatch(getTypes())
-    }, [dispatch] );
+    }, [dispatch])
 
-    const [input, setInput] = useState({
-        nombre: "",
-        imagen: "",
-        vida: "",
-        fuerza: "",
-        defensa: "",
-        velocidad: "",
-        altura: "",
-        peso: "",
-        type: [],
+    let typesFetch = useSelector(state => state.types)
 
-    })
+    let [selectedTypes, setSelectedTypes] = useState([])
+    let [newPokemonObject, setNewPokemonObject] = useState()
 
-    function handleChange(e){
-        setInput({
-            ...input,
-            [e.target.name] : e.target.value
-        })
-        setErrors(validaciones({ ...input, [e.target.name]: e.target.value }));
+
+    let regExpName = RegExp(/^[a-zA-Z]+$/)
+    let regExpNumber = RegExp(/^[0-9]+$/)
+    let regExpUrl = RegExp(/^(https?:\/\/.*\.(?:jpg|jpeg|gif))$/)
+
+
+    let [nameAdvert, setNameAdvert] = useState(false)
+    let [hpAdvert, setHpAdvert] = useState(false)
+    let [defenseAdvert, setDefenseAdvert] = useState(false)
+    let [attackAdvert, setAttackAdvert] = useState(false)
+    let [speedAdvert, setSpeedAdvert] = useState(false)
+    let [weightAdvert, setWeightAdvert] = useState(false)
+    let [heightAdvert, setHeightAdvert] = useState(false)
+    let [imageAdvert, setImageAdvert] = useState(false)
+    let [typeAdvert, setTypeAdvert] = useState(false)
+    let [addedTypeAdvert, setAddedTypeAdvert] = useState(true)
+    let [globalAdvert, setGlobalAdvert] = useState(true)
+
+    function handleChange(e) {
+        e.preventDefault();
+
+        if (e.target.name === "name") {
+            if (!regExpName.test(e.target.value)) { setNameAdvert(false) }
+            else {
+                setNameAdvert(true)
+                setNewPokemonObject({ ...newPokemonObject, [e.target.name]: e.target.value })
+            }
+        }
+        if (e.target.name === "hp") {
+            if (!regExpNumber.test(e.target.value) || (!e.target.value > 0)) { setHpAdvert(false) }
+            else {
+                setHpAdvert(true);
+                setNewPokemonObject({ ...newPokemonObject, [e.target.name]: e.target.value })
+
+            }
+        }
+        if (e.target.name === "defense") {
+            if (!regExpNumber.test(e.target.value) || (!e.target.value > 0)) { setDefenseAdvert(false) }
+            else {
+                setDefenseAdvert(true);
+                setNewPokemonObject({ ...newPokemonObject, [e.target.name]: e.target.value })
+
+            }
+        }
+        if (e.target.name === "attack") {
+            if (!regExpNumber.test(e.target.value) || (!e.target.value > 0)) { setAttackAdvert(false) }
+            else {
+                setAttackAdvert(true);
+                setNewPokemonObject({ ...newPokemonObject, [e.target.name]: e.target.value })
+            }
+        }
+        if (e.target.name === "speed") {
+            if (!regExpNumber.test(e.target.value) || (!e.target.value > 0)) { setSpeedAdvert(false) }
+            else {
+                setSpeedAdvert(true);
+                setNewPokemonObject({ ...newPokemonObject, [e.target.name]: e.target.value })
+
+            }
+        }
+        if (e.target.name === "weight") {
+            if (!regExpNumber.test(e.target.value) || (!e.target.value > 0)) { setWeightAdvert(false) }
+            else {
+                setWeightAdvert(true);
+                setNewPokemonObject({ ...newPokemonObject, [e.target.name]: e.target.value })
+
+            }
+        }
+        if (e.target.name === "height") {
+            if (!regExpNumber.test(e.target.value) || (!e.target.value > 0)) { setHeightAdvert(false) }
+            else {
+                setHeightAdvert(true);
+                setNewPokemonObject({ ...newPokemonObject, [e.target.name]: e.target.value })
+
+            }
+        }
+        if (e.target.name === "image") {
+            if (!regExpUrl.test(e.target.value)) { setImageAdvert(false) }
+            else {
+                setImageAdvert(true);
+                setNewPokemonObject({ ...newPokemonObject, [e.target.name]: e.target.value })
+                // console.log(newPokemonObject)
+
+            }
+        }
+        setNewPokemonObject({ ...newPokemonObject, [e.target.name]: e.target.value })
+        setGlobalAdvert(true)
     }
 
-    function handleSelect(e){     
-        setInput({
-            ...input,
-            type: [...input.type, e.target.value],
-        });   
-    }
+    function handleSelectChange(e) {
+        // console.log(document.getElementById("typeSelector").value)
 
-    function handleSubmit(submit){
-        submit.preventDefault();
-        console.log(input);
-        dispatch(postPokemon(input));
-        alert("Pokemon creado")
-        setInput({
-            nombre: "",
-            imagen: "",
-            vida: "",
-            fuerza: "",
-            defensa: "",
-            velocidad: "",
-            altura: "",
-            peso: "",
-            type: [],
-        })
+        setAddedTypeAdvert(true)
+        let currentValue = document.getElementById("typeSelector").value
+        if (currentValue === "") { return selectedTypes }
+        if (selectedTypes === []) { setTypeAdvert(false) }
+        if ((selectedTypes.length + 1) === 3) { return setTypeAdvert(false) }
+        if (selectedTypes.includes(currentValue)) {
+            setAddedTypeAdvert(false)
+            return selectedTypes
+        }
+        else {
+            setTypeAdvert(true)
+            setSelectedTypes([...selectedTypes, document.getElementById("typeSelector").value])
+        }
+        // console.log(newPokemonObject)
 
     }
+    let [createdOk, setCreatedOk] = useState(true)
+    let [addedTypes, setAddedTypes] = useState(true)
 
-    //className={styles.}
+    async function onSubmit(e) {
+        e.preventDefault();
+        setGlobalAdvert(true)
+        if (nameAdvert === false || hpAdvert === false || defenseAdvert === false || attackAdvert === false || speedAdvert === false || weightAdvert === false || heightAdvert === false || imageAdvert === false || typeAdvert === false) {
+            setGlobalAdvert(false)
 
-    return(
-        <div className={styles.create_container}>
+        } else {
 
-            <Link to="/home"><button className={styles.buttonform}>Volver</button></Link>
+            setGlobalAdvert(true)
+            // await fetch(`${process.env.REACT_APP_HOST_BACK}/pokemons`, {
+            await fetch(`${process.env.REACT_APP_HOST_BACK}/pokemons`, {
+                method: 'POST', // *GET, POST, PUT, DELETE, etc.    
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(newPokemonObject) // body data type must match "Content-Type" header
+            });
+            setCreatedOk(false)
+        }
+        //redirige a /home
+        window.location.href = "/home";
+    }
 
-            <h1 className={styles.create_title}>Detailed your pokemon</h1>
+    function onClickType(e) {
+        e.preventDefault();
 
-                <form className={styles.form_container} onSubmit={(e)=>handleSubmit(e)}>
+        let arrayTypes = selectedTypes
+        arrayTypes = arrayTypes.filter(t => t !== e.target.id)
+        let string = arrayTypes.toString()
+        if (string === "" || selectedTypes === []) {
+            setTypeAdvert(false)
+        }
+        setSelectedTypes(arrayTypes)
+        setNewPokemonObject({ ...newPokemonObject, pokemonType: string })
+    }
 
-                        
-                            <div className={styles.labelInput_cnt}>
-                            <label>Nombre:</label>
-                            <input
-                            type="text"
-                            value={input.nombre}
-                            name= "nombre"
-                            onChange={handleChange}/>
-                            </div>
-                            {errors.nombre && (<p className={styles.errorinput}> {errors.nombre}</p>)}
-                            
-                            <div className={styles.labelInput_cnt}>
-                            <label>Vida:</label>
-                            <input
-                            type= "number"
-                            value= {input.vida}
-                            name= "vida"
-                            onChange={handleChange}/>
-                            </div> 
-                            {errors.vida && (<p className='error-input'>{errors.vida}</p>)}
-                            
-                        
+    function addTypes(e) {
+        e.preventDefault();
+        let string = selectedTypes.toString(", ")
+        setNewPokemonObject({ ...newPokemonObject, ["pokemonType"]: string })
+        setAddedTypes(false)
 
-                            <div className={styles.labelInput_cnt}>
-                            <label>Ataque: </label>
-                            <input
-                            type= "number"
-                            value= {input.fuerza}
-                            name= "fuerza"
-                            onChange={handleChange}/>
-                            </div>        
-                            {errors.fuerza && (<p className='error-input'>{errors.fuerza}</p>)}    
-                            
-                            <div className={styles.labelInput_cnt}>
-                            <label>Defensa: </label>
-                            <input
-                            type= "number"
-                            value= {input.defensa}
-                            name= "defensa"
-                            onChange={handleChange}/>
-                            </div>
-                            {errors.defensa && (<p className='error-input'>{errors.defensa}</p>)}
+    }
 
-                            <div className={styles.labelInput_cnt}>
-                            <label>Speed: </label>
-                            <input
-                            type= "number"
-                            value= {input.velocidad}
-                            name= "velocidad"
-                            onChange={handleChange}/>
-                            </div>
-                            {errors.velocidad && (<p className='error-input'>{errors.velocidad}</p>)}
 
-                            <div className={styles.labelInput_cnt}>
-                            <label>Height: </label>
-                            <input
-                            type= "number"
-                            value= {input.altura}
-                            name= "altura"
-                            onChange={handleChange}/>
-                            </div>
-                            {errors.altura && (<p className='error-input'>{errors.altura}</p>)}
 
-                            <div className={styles.labelInput_cnt}>
-                            <label>Peso: </label>
-                            <input
-                            type= "number"
-                            value= {input.peso}
-                            name= "peso"
-                            onChange={handleChange}/>
-                            </div>
-                            {errors.peso && (<p className='error-input'>{errors.peso}</p>)}
+    return (
+        <div className={style.container}>
+            <h1>New Pokemon on Pokedex</h1>
+            <br />
+            <br />
+            <form>
+                <label>Name </label> <br />
+                <input onChange={e => handleChange(e)} type="text" placeholder="Name" name="name" /><br />
+                <small className={style.allow} hidden={nameAdvert}>Numbers & Symbols not allowed.</small><br /> <br />
 
-                            <div className={styles.labelInput_cnt}>
-                            <label>Imagen: </label>
-                            <input
-                            alt='not found' 
-                            value={input.imagen} 
-                            name='imagen' 
-                            pattern='https?:\/\/[\w\-]+(\.[\w\-]+)+[/#?]?.*$' 
-                            title='FORMATO URL'
-                            placeholder='URL de imagen' 
-                            onChange={handleChange}/>
-                            </div> 
+                <label>Health Points </label> <br />
+                <input onChange={e => handleChange(e)} type="number" placeholder="Health Points" min="0" name="hp" /><br />
+                <small className={style.allow} hidden={hpAdvert}>Only Natural Numbers allowed.</small><br /> <br />
 
-                            <div>
-                            <select className={styles.types_select} onChange={(selection) => handleSelect(selection)}>
-                                {types.map((typ)=>(
-                                    <option value={typ.nombre}>
-                                        {typ.nombre}
-                                    </option>
-                                ))}
-                                </select>  
-                            </div>
-                            <div className={styles.selecciones}>
-                            <ul><li>{input.type.map(seleccionado => (seleccionado+ " " ))}</li></ul>        
-                            </div>
-                            <button  className={styles.buttonform} type="submit">Create Pokemon</button>
-                </form>
+                <label>Defense </label> <br />
+                <input onChange={e => handleChange(e)} type="number" placeholder="Defense" min="0" name="defense" /><br />
+                <small className={style.allow} hidden={defenseAdvert}>Only Natural Numbers allowed.</small><br /> <br />
 
+                <label>Attack </label> <br />
+                <input onChange={e => handleChange(e)} type="number" placeholder="Attack" min="0" name="attack" /><br />
+                <small className={style.allow} hidden={attackAdvert}>Only Natural Numbers allowed.</small><br /> <br />
+
+                <label>Speed </label> <br />
+                <input onChange={e => handleChange(e)} type="number" placeholder="Speed" min="0" name="speed" /><br />
+                <small className={style.allow} hidden={speedAdvert}>Only Natural Numbers allowed.</small><br /> <br />
+
+                <label>Weight </label> <br />
+                <input onChange={e => handleChange(e)} type="number" placeholder="Weight" min="0" name="weight" /><br />
+                <small className={style.allow} hidden={weightAdvert}>Only Natural Numbers allowed.</small><br /> <br />
+
+                <label>Height </label> <br />
+                <input onChange={e => handleChange(e)} type="number" placeholder="Height" min="0" name="height" /><br />
+                <small className={style.allow} hidden={heightAdvert}>Only Natural Numbers allowed.</small><br /> <br />
+
+                <label>Select Types:</label> <br />
+                <small className={style.allow} hidden={addedTypeAdvert}>Value already chosen.</small><br />
+                <select id={'typeSelector'} defaultValue={""} name={"pokemonType"} onChange={e => handleSelectChange(e)}>
+                    <option value="">Select Type</option>
+                    {
+                        typesFetch?.map(type => {
+                            return (
+                                <option key={type} name={type} value={type}>{type}</option>
+                            )
+                        })
+                    }
+                </select><br />
+                <input type="button" value="Ok! Add Types" onClick={e => addTypes(e)} /><br />
+                <small className={style.allow} hidden={typeAdvert}>Select 1 or 2 types.</small><br />
+
+                <h3>{selectedTypes.map(t => <div key={t} onClick={onClickType} id={t} value={t}>{t}</div>)}</h3>
+                <success className={style.created} hidden={addedTypes}>Type/s added!</success> <br />
+
+                <label>Picture URL </label> <br />
+                <input onChange={e => handleChange(e)} type="url" placeholder="Image" name="image" /><br />
+                <small className={style.allow} hidden={imageAdvert}>Insert a valid Image URL-JPG, JPEG, GIF</small><br />
+
+
+                <input type="button" value="Go!" onClick={e => onSubmit(e)} /><br />
+                <small className={style.allow} hidden={globalAdvert}>Please Fill all fields correctly.</small><br />
+                <success className={style.created} hidden={createdOk}>Pokémon Created with Success!</success> <br />
+            </form><br /><br />
+            <NavLink to="/home">
+                <input type="button" value="Back Home" />
+            </NavLink>
         </div>
     )
 }
+
+export default Add

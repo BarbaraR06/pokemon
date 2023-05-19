@@ -1,23 +1,32 @@
 //las acciones describen que algo pasó
 //la única forma de modificar un estado es emitiendo una acción, es un obj que describe un suceso
 // solo ingresa al store si es enviada mediante la funcion dispatch
-
-
 import axios from 'axios';
 
+export const GET_POKEMONS = "GET_POKEMONS";
+export const GET_DETAILS = "GET_DETAILS";
+export const GET_TYPES = "GET_TYPES"; 
+export const ORDER_BY_ATTACK = "ORDER_BY_ATTACK";
+export const ORDER_BY_NAME = "ORDER_BY_NAME";
+export const FILTER_CREATED = "FILTER_CREATED";
+export const GET_NAME_POKEMONS = "GET_NAME_POKEMONS";
+export const FILTER_BY_TYPE = "FILTER_BY_TYPE";
 
 
-// UNION ENTRE BACK Y FRONT 
-//TRAE LOS POKEMONES DE LA API
+
+
 export function getPokemons(){
     return async function(dispatch){
-        const pokeDex = await axios.get("/pokemons");
+        await fetch(`${process.env.REACT_APP_HOST_BACK}/pokemons`)
         //TRAE TODOS LOS POKEMONES AL HOME CON SUS TIPOS E IMAGENES
-        return dispatch({
-            type: 'GET_POKEMONS', //type: describe lo que queremos hacer
-            payload: pokeDex.data 
-        });        
-    };
+        .then(p=>p.json())
+        .then((arrayFetch)=>{
+            dispatch({
+                type: 'GET_POKEMONS',
+                payload: arrayFetch,
+            })
+        })
+    }
 }
 
 

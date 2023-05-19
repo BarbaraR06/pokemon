@@ -2,7 +2,7 @@ import React from "react";
 import styles from "./Card.module.css";
 import styled from 'styled-components';
 
-export default function Card({ name, sprite, id, types }) {
+export default function Card({ name,image, types }) {
 
   function colorPicker(mainType) {
 		switch (mainType) {
@@ -97,15 +97,13 @@ export default function Card({ name, sprite, id, types }) {
     <Containercard>
     <div className={styles.container}>
               <div>
-                
-                <img  className={styles.img} src={sprite} alt="Img not found"  width="500px" heigth="550px"/>
+                <img  className={styles.img} src={image} alt="Img not found"  width="500px" heigth="550px"/>
                   <h2>{name}</h2>
                               <div>
                               {types?.map((e)=>{
                                 return(
                                   <div>
                                     <span>{e}</span>
-
                                   </div>
                                       )
                                     })}

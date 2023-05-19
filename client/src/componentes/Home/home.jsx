@@ -119,32 +119,32 @@ export default function Home(){
             {/* INICIO DE CARD */}
             <div className={styles.containerCards}>
                 {currentPokemons.map((ob) => {
-                 return(
+                    return (
                         <div className={styles.cards}>
 
-                            <Link to ={`/pokemons/${ob.id}`} >
-                                    <Card 
-                                        name={ob.name}
-                                        sprite={ob.sprite}
-                                        types={ob.types}
-                                        key={ob.id}/>
+                            <Link to={`/pokemons/${ob.id}`} >
+                                <Card
+                                    name={ob.name}
+                                    sprite={ob.sprite}
+                                    types={ob.types}
+                                    key={ob.id} />
                             </Link>
 
-                        </div>    
-                        )
-                        
+                        </div>
+                    )
+
                 })
-                
+
                 }
             </div>
             {/* CIERRE DE CARD */}
 
 
-            </div>
+        </div>
 
 
 
 
-        
+
     )
 }

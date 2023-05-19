@@ -1,18 +1,97 @@
-const {Router} = require('express');
-const {getAllPoke} = require('../controllers/pokemonController');
-const { Pokemon, Type} = require('../db');
+const { Router } = require('express');
+const { Pokemon, Type } = require('../db');
 const router = Router();
 const { fetch } = require("cross-fetch");
+const {getAllPoke} = require('../controllers/pokemonController');
 // 1 TRAE TODOS LOS POKEMONES DE BASE DE DATOS Y DE API CON EL LLAMADO HTTP
 //UTILIZANDO LA FUNCION getAllPoke traída de pokemonController
 
+
 router.get('/', async (req, res) => {
-    try {
-     return res.status(200).send(await getAllPoke());
-    } catch (error) {
-        return res.status(404).send('Pokemon no encontrado');
-    }
+  try {
+    return res.status(200).send(await getAllPoke());
+  } catch (error) {
+    console.log('entro error');
+    return res.status(404).send('Pokemons not found');
+  }
 });
+
+
+
+router.get("/:name", async (req, res, next) => {
+    try {
+      const { name } = req.params;
+      const lowercaseName = name.toLowerCase();
+  
+      // Buscar en la API externa
+      const searchApi = await fetch(`https://pokeapi.co/api/v2/pokemon/${lowercaseName}`)
+        .then((response) => {
+          if (response.status !== 404) {
+            return response.json();
+          } else {
+            return null; // Cambio: Devuelve null cuando no se encuentra en la API
+          }
+        })
+        .then((pokemonData) => {
+          if (pokemonData && pokemonData.name) {
+            let typesString = "";
+            pokemonData.types.forEach((t, index) => {
+              typesString = typesString + t.type.name + " ";
+            });
+            pokemonData.name = pokemonData.name.charAt(0).toUpperCase() + pokemonData.name.slice(1);
+  
+            return {
+              pokemonType: typesString,
+              hp: pokemonData.stats[0].base_stat,
+              defense: pokemonData.stats[2].base_stat,
+              attack: pokemonData.stats[1].base_stat,
+              speed: pokemonData.stats[5].base_stat,
+              weight: pokemonData.weight,
+              height: pokemonData.height,
+              image: pokemonData.sprites.other.dream_world.front_default,
+              name: pokemonData.name,
+              id: pokemonData.id,
+            };
+          }
+          return null; // Cambio: Devuelve null cuando no se encuentra en la API
+        });
+  
+      // Buscar en la base de datos
+      const searchDb = await Pokemon.findAll()
+        .then((db) => {
+          if (db === null || db === undefined) {
+            db = [];
+          }
+          return db;
+        })
+        .then((dbData) => {
+          let newSearch = dbData.map((pokemon) => {
+            let string = "";
+            let array = pokemon.pokemonType.split(",");
+            array.forEach((t) => {
+              string = string + t + " ";
+            });
+            pokemon.pokemonType = string;
+  
+            if (pokemon.name.toLowerCase() === lowercaseName) {
+              return pokemon;
+            }
+            return null; // Cambio: Devuelve null cuando no se encuentra en la base de datos
+          });
+          return newSearch;
+        });
+  
+      const fullArray = searchDb.concat(searchApi).filter((el) => el != null);
+  
+      if (fullArray.length > 0) {
+        res.send(fullArray);
+      } else {
+        res.status(404).send("Pokémon no encontrado");
+      }
+    } catch (err) {
+      next(err);
+    }
+  });
 
 //BUSCA LOS POKEMONS POR SUS ID PRIMERO LLAMANDO A LA FUNCION getAllPoke
 //LUEGO FILTRA EL OBJETO CREADO A PARTIR DE LA FUNCION POR SUS ID
@@ -52,7 +131,6 @@ router.get("/:id", async (req, res, next) => {
                     // console.log(a)
                     let newSearch = a.map((a) => {
                         if (a.id === id) {
-                            //formater pokemonType
                             let string = ""
                             let array = a.pokemonType.split(',')
                             array.forEach(t => {
@@ -70,74 +148,62 @@ router.get("/:id", async (req, res, next) => {
             res.send(searchDb)
         }
     } catch (error) {
-        return('Pokémon no encontrado');;
+        return ('Pokémon no encontrado');;
     }
 });
 
 //BUSCA LOS POKEMONS POR SUS ID PRIMERO LLAMANDO A LA FUNCION getAllPoke
 //LUEGO FILTRA EL OBJETO CREADO A PARTIR DE LA FUNCION POR SUS NAME
 
-router.get('/pokemons/:name', async (req, res) => {
-    const { name } = req.params;
-    const allPokemons = await getAllPoke();
-    try {
-        if (name) {
-            const pokemonName = allPokemons.filter(e => e.name.toLowerCase() === name.toLowerCase());
-            pokemonName 
-            ? res.status(200).json(pokemonName) 
-            : res.status(404).send('Pokemon not found')
-        }
-    } catch (error) {
-        console.log(error);
-    }
-})
-
 //POSTEO DE NUEVOS POKEMONES EN LA BASE DE DATOS
 
-router.post('/', async (req, res) => {
-    const {
-        nombre,
-        vida,
-        fuerza,
-        defensa,
-        velocidad,
-        altura,
-        peso,
-        imagen,
-        createdInDb,
-        type
-    } = req.body //indica los parametros pertenecientes al body en el JSON
+router.post("/", async (req, res, next) => {
+  try {
+    let {
+      name,
+      hp,
+      attack,
+      defense,
+      speed,
+      weight,
+      height,
+      pokemonType,
+      image,
+    } = req.body;
 
+    name = name.charAt(0).toUpperCase() + name.slice(1)
+
+    const exist = await Pokemon.findOne({ where: { name: name } });
+    if (exist) return res.status(300).json({ info:  `${name} already Exists in DB` });
+
+    await fetch(`${process.env.REACT_APP_HOST_BACK}/types`);
     let newPokemon = await Pokemon.create({
-        nombre,
-        vida,
-        fuerza,
-        defensa,
-        velocidad,
-        altura,
-        peso,
-        imagen,
-        createdInDb
-    },{ validate: true }) //creador del nuevo Pokemon en la base de datos
-
-    let tipoDb = await Type.findAll({
+      name: name,
+      hp: hp,
+      attack: attack,
+      defense: defense,
+      speed: speed,
+      weight: weight,
+      height: height,
+      pokemonType: pokemonType,
+      image: image,
+    });
+    let pokemonTypes = pokemonType.split(", ");
+    pokemonTypes.forEach(async (typ) => {
+      let typeSearch = await Type.findOne({
         where: {
-            nombre: type
-        }
-    }) //busca todos los tipos de pokemones en la base de datos
+          name: typ,
+        },
+      });
 
-    newPokemon.addType(tipoDb)
-    res.send('El pokemon ha sido creado con éxito')
-})// agrega el tipo al nuevo pokemon
+      let relationship = newPokemon.addType(typeSearch);
+    });
+    res.status(200).send(newPokemon);
+  } catch (err) {
+    next(err);
+  }
+});
 
-router.get('/', async (req, res) => {
-    const query = req.query;
-    const pageIndex = req.query.page_index ? Number(req.query.page_index) : 1;
-    const pageSize = req.query.page_size ? Number(req.query.page_size) : 12;
-  
-    const pokemons = await utils.getPokemonsApi({ limit: pageSize, offset: (pageIndex - 1) * pageSize });
-  
-    return res.send(pokemons);
-  });
+
 
 module.exports = router;

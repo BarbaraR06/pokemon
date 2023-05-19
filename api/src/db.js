@@ -1,5 +1,5 @@
 require('dotenv').config();
-const { Sequelize, DataTypes } = require('sequelize');
+const { Sequelize } = require('sequelize');
 const fs = require('fs');
 const path = require('path');
 const { DB_USER, DB_PASSWORD, DB_HOST } = process.env;
@@ -41,10 +41,10 @@ let capsEntries = entries.map((entry) => [
 ]);
 sequelize.models = Object.fromEntries(capsEntries);
 
-const { Pokemons, Types } = sequelize.models;
+const { Pokemon, Type } = sequelize.models;
 
-Pokemons.belongsToMany(Types, { through: 'pokemon_type' });
-Types.belongsToMany(Pokemons, { through: 'pokemon_type' });
+Pokemon.belongsToMany(Type, { through: "PokemonType" });
+Type.belongsToMany(Pokemon, { through: "PokemonType" });
 
 
 module.exports = {
