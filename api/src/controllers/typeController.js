@@ -27,11 +27,11 @@ addTypeDb()
 
 
 // 2 - LOS TYPES SON TRAIDOS DE LA BASE DE DATOS Y ENVIADOS AL ROUTER
-const getTypeApi = async (req, res) => {
-    const result = await Types.findAll();
-    return res.send(result)
+const getTypeApi = async () => {
+    const result = await Type.findAll();
+    return result;
 }
 
 module.exports = {
-    getTypeApi
+    getTypeApi,
 };

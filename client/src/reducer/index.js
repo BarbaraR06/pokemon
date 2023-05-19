@@ -97,7 +97,7 @@ function rootReducer(state = initialState, action) { //el rootReducer sirve para
         case 'GET_DETAILS':
             return {
                 ...state, 
-                details: action.payload,
+                detail: action.payload,
             }
             
         case 'FILTER_BY_TYPE':

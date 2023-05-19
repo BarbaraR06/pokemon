@@ -18,7 +18,6 @@ export const FILTER_BY_TYPE = "FILTER_BY_TYPE";
 export function getPokemons(){
     return async function(dispatch){
         await fetch(`${process.env.REACT_APP_HOST_BACK}/pokemons`)
-        //TRAE TODOS LOS POKEMONES AL HOME CON SUS TIPOS E IMAGENES
         .then(p=>p.json())
         .then((arrayFetch)=>{
             dispatch({
@@ -80,11 +79,11 @@ export function orderByAttack(payload) {
 }
 
 //BUSQUEDA POR NOMBRE
-
+//revisar esto!!!!!!!!!!!!!!!!!!!!!!!!1
 export function getNamePokemons(name){
     return async function (dispatch){
         try{
-            let json = await axios.get(`/pokemons/pokemon/`+ name);
+            let json = await axios.get(`${process.env.REACT_APP_HOST_BACK}/pokemons/pokemon/`+ name); 
                 return dispatch({
                     type: "GET_NAME_POKEMONS",
                     payload: json.data

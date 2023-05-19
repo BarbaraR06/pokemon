@@ -3,7 +3,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import { getPokemons, orderByName, filterCreated, orderByAttack, getTypes, filterType } from '../../actions/index';
 import {Link} from 'react-router-dom';
 import SearchBar from "../SearchBar/SearchBar";
-import styles from "./home.module.css";
+import styles from "./Home.module.css";
 import Card from "../Card/Card";
 import Paginado from '../Paginado/Paginado'
 

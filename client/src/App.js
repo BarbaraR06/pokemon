@@ -2,7 +2,7 @@ import './App.css';
 import React from 'react';
 import { Route, BrowserRouter as Router,} from 'react-router-dom';
 import LandingPage from './componentes/LandingPage/landingPage'
-import Home from './componentes/Home/home'
+import Home from './componentes/Home/Home'
 import CreatePokemon from './componentes/CreatePokemon/CreatePokemon'
 import Detail from './componentes/Detail/Detail';
 
